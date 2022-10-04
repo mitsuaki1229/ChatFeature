@@ -44,7 +44,6 @@
 | チャットグループID | chat_group_id | char(36) | Yes | UUID(v4) |
 | ユーザーID | user_id | char(36) | Yes | |
 | 登録日時 | create_datetime | datetime | Yes | |
-| 更新日時 | update_datetime | datetime | Yes | |
 
 ### インデックス
 
@@ -67,7 +66,6 @@
 | 画像URL | image_url | varchar(4096) | | |
 | スタンプID | stamp_id | char(36) | | |
 | 登録日時 | create_datetime | datetime | Yes | |
-| 更新日時 | update_datetime | datetime | Yes | |
 
 ### インデックス
 
