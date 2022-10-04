@@ -7,6 +7,7 @@ Chat feature sample.
 ## Requirement
 
 * [Swagger](https://swagger.io/)
+* [draw.io](https://app.diagrams.net/)
 
 ## Licence
 
