@@ -18,6 +18,7 @@ paths:
         - BearerAuth: []
       description: |
         トークの表示に必要な情報を取得する。
+        messagesに紐づくstamps・already_read_users・reactionsからメッセージに関する情報を結合し取得する。
       parameters:
         - name: id
           in: path
@@ -54,6 +55,8 @@ paths:
         - BearerAuth: []
       description: |
         トークの表示に必要な情報を取得する。
+        messagesに紐づくstamps・already_read_users・reactionsからメッセージに関する情報を結合し取得する。
+        chat_groupsに紐づくchat_group_members・background_musics・background_designsを結合し取得する。
       parameters:
         - name: id
           in: path
@@ -90,12 +93,13 @@ paths:
         - BearerAuth: []
       description: |
         メッセージを登録する。メッセージが登録された事をトリガーとし、受信者に通知が行われる。
+        messagesに指定したメッセージを登録する。
       requestBody:
         content:
           application/vnd.api+json:
             schema:
               type: object
-              description: アンケート
+              description: メッセージ
               required:
                 - data
               properties:
@@ -149,6 +153,7 @@ paths:
         - message
       description: |
         メッセージの削除を実施する。
+        messagesから指定したメッセージを削除する。
       parameters:
         - name: id
           required: true
@@ -181,6 +186,7 @@ paths:
         - BearerAuth: []
       description: |
         メッセージを既読にする。
+        already_read_usersに指定したメッセージの既読状態を保存する。
       parameters:
         - name: id
           required: true
@@ -272,12 +278,6 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/chat_message'
-                background_design_id:
-                  type: string
-                  example: d868d23a-aad8-4d2c-b5b8-939b3ae03b99
-                background_music_id:
-                  type: string
-                  example: 75ad74ce-5f5e-450a-85b7-8a0fc34ab39f
 
     get_talk_chat_groups_response:
       type: object
