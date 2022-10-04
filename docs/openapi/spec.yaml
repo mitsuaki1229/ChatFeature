@@ -1,0 +1,367 @@
+# @see https://swagger.io/specification/
+openapi: 3.0.3
+# @see https://swagger.io/specification/#info-object
+info:
+  version: 0.1.0
+  title: ChatFeature
+  description: To chat.
+servers:
+  - url: http://localhost:3001/v1
+    description: Local development server
+paths:
+  /talk/users/{id}:
+    get:
+      tags:
+        - talk
+      summary: ユーザーに対応したトークの取得。
+      security:
+        - BearerAuth: []
+      description: |
+        トークの表示に必要な情報を取得する。
+      parameters:
+        - name: id
+          in: path
+          description: ユーザーのID
+          required: true
+          schema:
+            type: string
+            example: '20e18856-c6b0-3bd1-0916-dfd93976fb44'
+      responses:
+        200:
+          description: 正常
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/get_talk_users_response'
+        401:
+          description: ログインが必要なとき。
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error401'
+        404:
+          description: 指定したIDに該当するトークが存在しないとき。
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error404'
+  /talk/chat_groups/{id}:
+    get:
+      tags:
+        - talk
+      summary: チャットグループに対応したトークの取得。
+      security:
+        - BearerAuth: []
+      description: |
+        トークの表示に必要な情報を取得する。
+      parameters:
+        - name: id
+          in: path
+          description: グループのID
+          required: true
+          schema:
+            type: string
+            example: 'd020fb3c-f5a0-f035-2710-c2f8cc27b124'
+      responses:
+        200:
+          description: 正常
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/get_talk_chat_groups_response'
+        401:
+          description: ログインが必要なとき。
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error401'
+        404:
+          description: 指定したIDに該当するトークが存在しないとき。
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error404'
+  /message:
+    post:
+      tags:
+        - message
+      summary: メッセージの登録。
+      security:
+        - BearerAuth: []
+      description: |
+        メッセージを登録する。メッセージが登録された事をトリガーとし、受信者に通知が行われる。
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              description: アンケート
+              required:
+                - data
+              properties:
+                data:
+                  type: object
+                  required:
+                    - attributes
+                  properties:
+                    attributes:
+                      type: object
+                      properties:
+                        sender_user_id:
+                          type: string
+                          description: 送信先ユーザーID
+                          example: 9281d9d3-7560-2aa2-cce6-d09c2adf96fc
+                        sender_chat_group_id:
+                          type: string
+                          description: 送信先チャットグループID
+                          example: d03e1e8e-c462-8b01-ec88-b81370f28044
+                        sender_message_id:
+                          type: string
+                          description: 送信先メッセージID
+                          example: 6633b830-7725-25f1-6479-d0b5afb39b37
+                        message:
+                          type: string
+                          description: メッセージ本文
+                          example: こんにちはこんにちは!!
+                        image:
+                          type: string
+                          description: base64 エンコードされた画像。
+                          example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC
+                        stamp_id:
+                          type: string
+                          description: スタンプのID
+                          example: 419634d6-e66d-27e2-22dc-6a3efda3421e
+      responses:
+        201:
+          description: 正常
+        401:
+          description: ログインが必要なとき。
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error401'
+  /messages/{id}:
+    delete:
+      summary: メッセージの削除。
+      security:
+        - BearerAuth: []
+      tags:
+        - message
+      description: |
+        メッセージの削除を実施する。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: メッセージのID
+          schema:
+            type: string
+            example: 28ab8393-788e-8d5b-521f-471b0ad11ba3
+      responses:
+        204:
+          description: 正常
+        401:
+          description: ログインが必要なとき
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error401'
+        404:
+          description: 指定したIDに該当するデータが存在しない
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error404'
+  /messages/{id}/mark_as_read:
+    patch:
+      tags:
+        - bodies
+      summary: メッセージの既読化
+      security:
+        - BearerAuth: []
+      description: |
+        メッセージを既読にする。
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              description: 既読にしたユーザーの情報
+              required:
+                - data
+              properties:
+                data:
+                  type: object
+                  required:
+                    - type
+                    - id
+                    - attributes
+                  properties:
+                    type:
+                      type: string
+                      example: mark_as_read
+                    id:
+                      type: string
+                      example: c6af7101-41ff-bcfc-5459-8262ca827392
+                    attributes:
+                      type: object
+                      properties:
+                        height:
+                          type: string
+                          description: 既読にしたユーザーのID
+                          example: 64551997-887a-9c6b-8f11-c0e0930010d3
+      responses:
+        204:
+          description: No Content
+        401:
+          description: ログインが必要なとき
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error401'
+        404:
+          description: 指定したIDに該当するメッセージが存在しないとき
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/error404'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    get_talk_users_response:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - id
+            - attributes
+          properties:
+            type:
+              type: string
+              example: talk
+            id:
+              type: string
+              example: f9739f5d-0e5d-4438-b85c-4cfe63926276
+            attributes:
+              type: object
+              required:
+                - user_room_name
+                - messages
+              properties:
+                user_room_name:
+                  type: string
+                  example: 田中太郎
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/chat_message'
+
+    get_talk_chat_groups_response:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - id
+            - attributes
+          properties:
+            type:
+              type: string
+              example: talk
+            id:
+              type: string
+              example: f9739f5d-0e5d-4438-b85c-4cfe63926276
+            attributes:
+              type: object
+              required:
+                - groups_name
+                - messages
+              properties:
+                group_name:
+                  type: string
+                  example: Swift愛好会
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/chat_message'
+
+    chat_message:
+      type: object
+      required:
+        - chat_message_id
+        - send_user_id
+        - sent_time
+      properties:
+        chat_message_id:
+          type: string
+          example: 26f7a807-8ea9-9d49-dd51-9b14b8358e2c
+        send_user_id:
+          type: string
+          example: 3a022084-c0ab-2957-5c71-daebf79eda43
+        received_user_id:
+          type: string
+          example: 53142811-7a17-a98b-e70d-b30ed9f06c02
+        received_chat_group_id:
+          type: string
+          example: cfeadf8d-dd31-03f1-ca00-23a862978105
+        received_message_id:
+          type: string
+          example: af4fd80e-8db4-fe82-ac9e-78744b168fd9
+        sent_time:
+          type: string
+          example: 2022-10-03T15:31:48+09:00
+
+    error401:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: object
+          required:
+            - status
+            - title
+            - detail
+          properties:
+            status:
+              type: integer
+              example: 401
+            title:
+              type: string
+              example: ログインが必要です。
+            detail:
+              type: string
+              example: ログインしてください。
+    error404:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: object
+          required:
+            - status
+            - title
+            - detail
+          properties:
+            status:
+              type: integer
+              example: 404
+            title:
+              type: string
+              example: データが見つかりません。
+            detail:
+              type: string
+              example: お探しのデータは見つかりませんでした。
